@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const AccountCreationPage(title: 'Fluttter Demo Home Page'),
+      home: const AccountCreationPage(title: 'Flutter Demo Home Page'),
     );
   }
 }

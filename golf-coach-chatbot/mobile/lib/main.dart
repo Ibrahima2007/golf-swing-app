@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'services/account_handler.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AccountHandler(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +38,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const AccountCreationPage(title: 'Flutter Demo Home Page'),
+      home: const AccountCreationPage(),
     );
   }
 }

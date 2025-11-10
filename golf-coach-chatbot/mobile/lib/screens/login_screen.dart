@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/account_handler.dart';
 
+class Globals {
+  static String sessionToken = '';
+}
 
 class AccountCreationPage extends StatefulWidget {
   const AccountCreationPage({super.key});
@@ -142,7 +145,8 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).createAccount(_firstName, _lastName, _email, _password);
-                            if (success) {
+                            if (success.isNotEmpty) {
+                              Globals.sessionToken = success;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Account created successfully!')),
                               );
@@ -242,6 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),                  Padding(
                       padding: pagePadding,
                       child: TextFormField(
+                        obscureText: true,
                         onSaved: (value) {
                           _password = value!;
                         },
@@ -267,11 +272,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           foregroundColor: Colors.white,
                           minimumSize: Size(300, 50)
                         ),
-                        onPressed: () {
-                          //if (_formKey.currentState!.validate()) {
-                            //_formKey.currentState!.save();
-                            //Provider.of<AccountHandler>(context, listen: false).createAccount(_firstName, _lastName, _email, _password);
-                          //}
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            final success = await Provider.of<AccountHandler>(context, listen: false).login(_email, _password);
+                            if (success.isNotEmpty) {
+                              Globals.sessionToken = success;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Successful login!')),
+                              );
+                            }
+                            else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Account not found.')),
+                              );
+                            }
+                          }
                         },
                         child: const Text('Log In'),
                       ),
@@ -287,10 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(builder: (context) => const AccountCreationPage()),
-                  );
+                  Navigator.pop(context);
                 },
                 child: Text('Don\'t have an account?')
               ),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class AccountHandler extends ChangeNotifier {
   final url = 'http://10.0.2.2:5000/account';
 
-  Future<bool> createAccount(String firstName, String lastName, String email, String password) async {
+  Future<String> createAccount(String firstName, String lastName, String email, String password) async {
     Map<String, String> request = {
       'first-name': firstName,
       'last-name': lastName,
@@ -19,14 +19,34 @@ class AccountHandler extends ChangeNotifier {
       body: json.encode(request),
     );
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 'success') {
       // Account created successfully
       print('Account created: ${response.body}');
-      return true;
+      return jsonResponse['session-token'];
     } else {
       // Handle error
-      print('Failed to create account: ${response.statusCode}');
-      return false;
+      print('Failed to create account: ${response.body}');
+      return '';
+    }
+  }
+
+  Future<String> login(String email, String password) async {
+    final headers = {"Content-Type": "application/json"};
+    final response = await http.get(
+      Uri.parse(url + '?' + 'email=${Uri.encodeComponent(email)}&password=${Uri.encodeComponent(password)}'),
+      headers: headers,
+    );
+
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 'success') {
+      // Login successful
+      print('Login successful: ${response.body}');
+      return jsonResponse['user-info']['session-token'];
+    } else {
+      // Handle error
+      print('Failed to login: ${response.body}');
+      return '';
     }
   }
 }

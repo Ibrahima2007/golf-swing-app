@@ -48,7 +48,9 @@ def createAccountBasics(data: dict) -> dict:
         return {'status': 'error', 'message': 'Email already exists'}
     
     salt = generateSalt()
+    sessionToken = generateSalt(30)
     hashedPassword = sha256((data['password'] + salt).encode()).hexdigest()
+    currentTime = datetime.now()
 
     newAccount = db.collection('user-info').document()
     newAccount.set({
@@ -62,12 +64,12 @@ def createAccountBasics(data: dict) -> dict:
         'privacy': '',
         'role': '',
         'country': '',
-        'data-of-birth': datetime.now(),
-        'date-created': datetime.now(),
-        'session-token': ''
+        'data-of-birth': currentTime,
+        'date-created': currentTime,
+        'session-token': sessionToken
     })
 
-    return {'status': 'success', 'message': 'Account created successfully'}
+    return {'status': 'success', 'message': 'Account created successfully', 'session-token': sessionToken}
 
 def getAccount(email: str, password: str) -> dict:
     matchingEmail = db.collection('user-info').where('email', '==', email).get()
@@ -81,6 +83,10 @@ def getAccount(email: str, password: str) -> dict:
 
     if hashedPassword != userData['hashed-password']:
         return {'status': 'error', 'message': 'Incorrect password'}
+    
+    sessionToken = generateSalt(30)
+    userDoc.reference.update({'session-token': sessionToken})
+    userData['session-token'] = sessionToken
     
     return {
         'status': 'success',

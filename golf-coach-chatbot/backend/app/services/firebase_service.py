@@ -64,12 +64,12 @@ def createAccountBasics(data: dict) -> dict:
         'privacy': '',
         'role': '',
         'country': '',
-        'data-of-birth': currentTime,
+        'date-of-birth': currentTime,
         'date-created': currentTime,
-        'session-token': sessionToken
+        'session_token': sessionToken
     })
 
-    return {'status': 'success', 'message': 'Account created successfully', 'session-token': sessionToken}
+    return {'status': 'success', 'message': 'Account created successfully', 'session_token': sessionToken}
 
 def getAccount(email: str, password: str) -> dict:
     matchingEmail = db.collection('user-info').where('email', '==', email).get()
@@ -85,11 +85,50 @@ def getAccount(email: str, password: str) -> dict:
         return {'status': 'error', 'message': 'Incorrect password'}
     
     sessionToken = generateSalt(30)
-    userDoc.reference.update({'session-token': sessionToken})
-    userData['session-token'] = sessionToken
+    userDoc.reference.update({'session_token': sessionToken})
+    userData['session_token'] = sessionToken
     
     return {
         'status': 'success',
         'message': 'Login successful',
         'user-info': userData
+    }
+
+def getAccountInfo(session_token: str) -> dict:
+    matchingToken = db.collection('user-info').where('session_token', '==', session_token).get()
+
+    if len(matchingToken) == 0:
+        return {'status': 'error', 'message': 'Invalid session token'}
+    
+    userDoc = matchingToken[0]
+    userData = userDoc.to_dict()
+    
+    return {
+        'status': 'success',
+        'message': 'Account info retrieved successfully',
+        'user-info': userData
+    }
+
+def updateAccountInfo(data: dict) -> dict:
+    matchingToken = db.collection('user-info').where('session_token', '==', data["session_token"]).get()
+
+    if len(matchingToken) == 0:
+        return {'status': 'error', 'message': 'Invalid session token'}
+
+    userDoc = matchingToken[0]
+    userData = userDoc.to_dict()
+    
+    for info in ["gender", "level-of-golf", "privacy", "role", "country"]:
+        userDoc.reference.update({info: data[info]})
+        userData[info] = data[info]
+    
+    dateTimeFormatString = "%Y-%m-%d %H:%M:%S.%f"
+    dateTimeBirthDate = datetime.strptime(data["date-of-birth"], dateTimeFormatString)
+    userDoc.reference.update({"date-of-birth": dateTimeBirthDate})
+    userData[info] = data["date-of-birth"]
+    
+    return {
+        "status": "success",
+        "message": "Account info succesfully updated",
+        "user-info": userData
     }

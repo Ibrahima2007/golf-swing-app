@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.5.0
   provider: ^6.1.5+1
+  dob_input_field: ^1.0.0
+  country_picker: ^2.0.27
 
 dev_dependencies:
   flutter_test:

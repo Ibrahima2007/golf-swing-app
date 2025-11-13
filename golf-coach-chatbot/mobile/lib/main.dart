@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Golf Swing Analysis',
+      title: 'Golf Swing Analysiss',
       theme: ThemeData(
         // This is the theme of your application.
         //

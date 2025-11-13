@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 class AccountHandler extends ChangeNotifier {
   final url = 'http://10.0.2.2:5000/account';
 
+  // demo user name
+  String get userName => "Alex";
+
   Future<String> createAccount(String firstName, String lastName, String email, String password) async {
     Map<String, String> request = {
       'first-name': firstName,

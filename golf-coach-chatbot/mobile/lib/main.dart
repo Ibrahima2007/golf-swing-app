@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/home_page.dart';
 import 'screens/login_screen.dart';
+import 'screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'services/account_handler.dart';
 
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const HomePage(),
+      home: const ProfileScreen(),
     );
   }
 }

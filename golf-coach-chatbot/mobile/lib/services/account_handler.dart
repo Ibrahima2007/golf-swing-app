@@ -17,7 +17,7 @@ class AccountHandler extends ChangeNotifier {
     };
     final headers = {"Content-Type": "application/json"};
     final response = await http.post(
-      Uri.parse(url + '/part1'),
+      Uri.parse('$url/part1'),
       headers: headers,
       body: json.encode(request),
     );
@@ -37,7 +37,7 @@ class AccountHandler extends ChangeNotifier {
   Future<String> login(String email, String password) async {
     final headers = {"Content-Type": "application/json"};
     final response = await http.get(
-      Uri.parse(url + '?' + 'email=${Uri.encodeComponent(email)}&password=${Uri.encodeComponent(password)}'),
+      Uri.parse('$url?email=${Uri.encodeComponent(email)}&password=${Uri.encodeComponent(password)}'),
       headers: headers,
     );
 

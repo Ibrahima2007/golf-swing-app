@@ -1,44 +1,82 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/screens/home_page.dart';
-import 'package:mobile/screens/information_screen.dart';
+import 'package:mobile/screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import '../services/account_handler.dart';
+import 'home_page.dart';
+import 'information_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final String username = "DemoUser"; // Replace with actual username later
+    return FutureBuilder(
+      future: Provider.of<AccountHandler>(context, listen: false)
+          .getUserInfo(Globals.sessionToken),
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
+        // Error
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(
+              child: Text(
+                "Error loading profile",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          );
+        }
+
+        // Loaded successfully
+        final account = snapshot.data as Map<String, dynamic>;
+        final String username = account["first-name"] ?? "Player";
+
+        return _buildProfile(context, username);
+      },
+    );
+  }
+
+  // ——————————————————————————————————————————————
+  //   FULL UI (everything centered like you wanted)
+  // ——————————————————————————————————————————————
+  Widget _buildProfile(BuildContext context, String username) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+
       body: SafeArea(
         child: Column(
           children: [
-            // Title at the top, centered
+            // Title centered at top
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: Text(
-                  "$username Profile",
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
+              child: Text(
+                "$username Profile",
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
 
-            // Centered content
+            // Center column content
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Profile Logo
+                    // Profile Avatar
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.green,
-                      child: const Icon(Icons.person, color: Colors.white, size: 50),
+                      child: const Icon(Icons.person,
+                          color: Colors.white, size: 50),
                     ),
                     const SizedBox(height: 40),
 
@@ -50,9 +88,12 @@ class ProfileScreen extends StatelessWidget {
                         minimumSize: const Size(250, 50),
                       ),
                       onPressed: () {
-                        // TODO: Show information dialog or page
-                        Navigator.push(context,
-                            MaterialPageRoute<void>(builder: (context) => const InformationPage()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const InformationPage(),
+                          ),
+                        );
                       },
                       child: const Text("Information"),
                     ),
@@ -66,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
                         minimumSize: const Size(250, 50),
                       ),
                       onPressed: () {
-                        // TODO: Navigate to change password page
+                        // TODO: Change password screen
                       },
                       child: const Text("Change Password"),
                     ),
@@ -80,29 +121,33 @@ class ProfileScreen extends StatelessWidget {
 
       // Bottom Navigation Bar
       bottomNavigationBar: Container(
-        color: Colors.green,
+        color: Colors.green.shade600,
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            // Home icon (outline because NOT active)
             IconButton(
               icon: const Icon(Icons.home_outlined, color: Colors.white),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute<void>(builder: (context) => const HomePage()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                );
               },
             ),
+
+            // Chat icon
             IconButton(
-              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-              onPressed: () {
-                // TODO: Navigate to chat screen
-              },
+              icon:
+                  const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              onPressed: () {},
             ),
+
+            // Profile icon (filled because ACTIVE)
             IconButton(
-              icon: const Icon(Icons.person, color: Colors.white), // active screen
-              onPressed: () {
-                // Already on profile screen
-              },
+              icon: const Icon(Icons.person, color: Colors.white),
+              onPressed: () {},
             ),
           ],
         ),

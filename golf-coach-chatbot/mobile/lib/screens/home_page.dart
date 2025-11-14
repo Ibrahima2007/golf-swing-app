@@ -187,6 +187,10 @@ class HomePage extends StatelessWidget {
                     color: Colors.white, size: 28),
                 onPressed: () {
                   // TODO: Navigate to Account page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(builder:(context) => const ProfileScreen()),
+                  );
                 },
               ),
             ],

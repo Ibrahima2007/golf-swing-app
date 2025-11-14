@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/home_page.dart';
+import 'package:mobile/screens/information_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -49,6 +51,8 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         // TODO: Show information dialog or page
+                        Navigator.push(context,
+                            MaterialPageRoute<void>(builder: (context) => const InformationPage()));
                       },
                       child: const Text("Information"),
                     ),
@@ -84,7 +88,8 @@ class ProfileScreen extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.home_outlined, color: Colors.white),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home_page.dart');
+                Navigator.push(context,
+                    MaterialPageRoute<void>(builder: (context) => const HomePage()));
               },
             ),
             IconButton(

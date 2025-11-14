@@ -9,9 +9,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var sessionToken = Globals.sessionToken;
+    print(Globals.sessionToken);
     return FutureBuilder(
       future: Provider.of<AccountHandler>(context, listen: false)
-          .getUserInfo(Globals.sessionToken),
+          .getUserInfo(sessionToken),
       builder: (context, snapshot) {
         // Loading state
         if (snapshot.connectionState == ConnectionState.waiting) {

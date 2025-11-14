@@ -139,6 +139,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).createAccount(_firstName, _lastName, _email, _password);
+                            print("Session token: " + success);
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
                               Navigator.push(
@@ -261,6 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).login(_email, _password);
+                            print("Session token: " + success);
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -493,7 +495,6 @@ class _AccountCreationPagePart1State extends State<AccountCreationPagePart1> {
                           _formKey.currentState!.save();
                           final success = await Provider.of<AccountHandler>(context, listen: false).updateAccountDetails(_dateOfBirth, _role, _privacy, _golf, _gender, _country, Globals.sessionToken);
                           if (success.isNotEmpty) {
-                            Globals.sessionToken = success;
                             Navigator.push(
                               context,
                               MaterialPageRoute<void>(builder: (context) => const HomePage()),
@@ -501,7 +502,7 @@ class _AccountCreationPagePart1State extends State<AccountCreationPagePart1> {
                           }
                           else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Email already in use, please choose a different one.')),
+                              SnackBar(content: Text('Failed to create account details.')),
                             );
                           }
                         }

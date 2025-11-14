@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:dob_input_field/dob_input_field.dart';
 import 'package:country_picker/country_picker.dart';
@@ -495,7 +496,7 @@ class _AccountCreationPagePart1State extends State<AccountCreationPagePart1> {
                             Globals.sessionToken = success;
                             Navigator.push(
                               context,
-                              MaterialPageRoute<void>(builder: (context) => const AccountCreationPagePart1()),
+                              MaterialPageRoute<void>(builder: (context) => const HomePage()),
                             );
                           }
                           else {

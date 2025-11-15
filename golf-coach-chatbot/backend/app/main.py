@@ -1,10 +1,12 @@
 #https://blog.logrocket.com/integrating-flask-flutter-apps/
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from services import firebase_service
 import os
 
 
 app = Flask(__name__)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 @app.route('/account/part1', methods=['POST'])

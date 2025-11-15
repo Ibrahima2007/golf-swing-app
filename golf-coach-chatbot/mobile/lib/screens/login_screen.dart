@@ -139,7 +139,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).createAccount(_firstName, _lastName, _email, _password);
-                            print("Session token: " + success);
+                            print("Session token: $success");
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
                               Navigator.push(
@@ -262,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).login(_email, _password);
-                            print("Session token: " + success);
+                            print("Session token: $success");
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
                               ScaffoldMessenger.of(context).showSnackBar(

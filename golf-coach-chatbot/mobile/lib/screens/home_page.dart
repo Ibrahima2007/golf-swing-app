@@ -10,7 +10,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var sessionToken = Globals.sessionToken;
-    print(Globals.sessionToken);
     return FutureBuilder(
       future: Provider.of<AccountHandler>(context, listen: false)
           .getUserInfo(sessionToken),

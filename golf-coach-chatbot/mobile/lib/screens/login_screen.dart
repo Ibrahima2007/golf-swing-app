@@ -266,8 +266,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             print("Session token: $success");
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Successful login!')),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(builder: (context) => const HomePage()),
                               );
                             }
                             else {

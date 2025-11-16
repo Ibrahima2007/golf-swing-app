@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mobile/screens/login_screen.dart';
 import 'package:mobile/screens/profile_screen.dart';
+import 'package:mobile/services/account_handler.dart';
+
+// TEMPORARY — Replace this with SharedPreferences later
+var sessionToken = Globals.sessionToken;
 
 class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
@@ -16,25 +22,54 @@ class _InformationPageState extends State<InformationPage> {
   String? gender;
   String? country;
 
-  // Date Picker Method
+  final accountHandler = AccountHandler();
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserInfo();
+  }
+
+  Future<void> loadUserInfo() async {
+    if (sessionToken.isEmpty) return;
+
+    final userInfo = await accountHandler.getUserInfo(sessionToken);
+    if (userInfo == null) return;
+
+    setState(() {
+      dob = formatDob(userInfo['date-of-birth']);
+      role = userInfo['role'];
+      privacy = userInfo['privacy'];
+      golfLevel = userInfo['level-of-golf'];
+      gender = userInfo['gender'];
+      country = userInfo['country'];
+    });
+  }
+
   Future<void> pickDOB() async {
+    DateTime initialDate = DateTime.now();
+    if (dob != null) {
+      try {
+        initialDate = DateFormat('MM/dd/yyyy').parse(dob!);
+      } catch (_) {}
+    }
+
     DateTime? date = await showDatePicker(
       context: context,
-      initialDate: DateTime(2005),
+      initialDate: initialDate,
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
     );
 
     if (date != null) {
       setState(() {
-        dob = "${date.month}/${date.day}/${date.year}";
+        dob = DateFormat('MM/dd/yyyy').format(date);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final primaryGreen = Colors.green;
     final skyBlue = Colors.lightBlue;
 
     return Scaffold(
@@ -42,7 +77,7 @@ class _InformationPageState extends State<InformationPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // 🔹 Top Row (Back + Profile Icon)
+            // HEADER
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Row(
@@ -62,39 +97,36 @@ class _InformationPageState extends State<InformationPage> {
               ),
             ),
 
-            // 🔹 Centered Content
+            // CONTENT
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // DOB Field (Date Picker)
                       buildDatePicker("Date of Birth", dob, pickDOB),
-
-                      // Dropdowns
                       buildDropdown(
                         "Role",
                         role,
                         (v) => setState(() => role = v),
-                        ["Player", "Coach", "Viewer"],
+                        ["Role", "Student", "Coach"],
                       ),
                       buildDropdown(
                         "Privacy",
                         privacy,
                         (v) => setState(() => privacy = v),
-                        ["Public", "Friends Only", "Private"],
+                        ["Privacy", "Public", "Private"],
                       ),
                       buildDropdown(
                         "Level of Golf",
                         golfLevel,
                         (v) => setState(() => golfLevel = v),
-                        ["Beginner", "Intermediate", "Advanced", "Pro"],
+                        ["Level of Golf", "Novice", "Amateur", "Professional", "Expert"],
                       ),
                       buildDropdown(
                         "Gender",
                         gender,
                         (v) => setState(() => gender = v),
-                        ["Male", "Female", "Other"],
+                        ["Gender", "Male", "Female", "Other", "Prefer not to say"],
                       ),
                       buildDropdown(
                         "Country",
@@ -108,10 +140,9 @@ class _InformationPageState extends State<InformationPage> {
                           "Other"
                         ],
                       ),
-
                       const SizedBox(height: 40),
 
-                      // 🔹 Save Button (Matches your theme)
+                      // SAVE CHANGES BUTTON
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: skyBlue,
@@ -121,15 +152,38 @@ class _InformationPageState extends State<InformationPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () {
-                          // TODO: Save user data to backend or local storage
-                          Navigator.push(context,
-                              MaterialPageRoute<void>(builder: (context) => const ProfileScreen()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Changes Saved"),
-                            ),
+                        onPressed: () async {
+                          if (sessionToken.isEmpty) return;
+
+                          // Update all fields in the database
+                          final result = await accountHandler.updateAccountDetails(
+                            dob,
+                            role,
+                            privacy,
+                            golfLevel,
+                            gender,
+                            country,
+                            sessionToken,
                           );
+
+                          if (result == "success") {
+                            // Show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Changes Saved")),
+                            );
+
+                            // Navigate back to ProfileScreen
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileScreen(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Failed to save changes")),
+                            );
+                          }
                         },
                         child: const Text(
                           "Save Changes",
@@ -148,18 +202,20 @@ class _InformationPageState extends State<InformationPage> {
     );
   }
 
-  // 🔹 Reusable Dropdown Builder
-  Widget buildDropdown(String label, String? value,
-      Function(String?) onChanged, List<String> items) {
+  // Dropdown builder
+  Widget buildDropdown(
+    String label,
+    String? value,
+    Function(String?) onChanged,
+    List<String> items,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 5),
-
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
@@ -171,10 +227,7 @@ class _InformationPageState extends State<InformationPage> {
               isExpanded: true,
               underline: const SizedBox(),
               hint: Text("Select $label"),
-              items: items
-                  .map((item) =>
-                      DropdownMenuItem(value: item, child: Text(item)))
-                  .toList(),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: onChanged,
             ),
           ),
@@ -183,18 +236,15 @@ class _InformationPageState extends State<InformationPage> {
     );
   }
 
-  // 🔹 DOB Date Picker Field UI
-  Widget buildDatePicker(
-      String label, String? value, VoidCallback onTapHandler) {
+  // Date Picker builder
+  Widget buildDatePicker(String label, String? value, VoidCallback onTapHandler) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 5),
-
           GestureDetector(
             onTap: onTapHandler,
             child: Container(
@@ -206,8 +256,7 @@ class _InformationPageState extends State<InformationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(value ?? "Select DOB",
-                      style: const TextStyle(fontSize: 15)),
+                  Text(value ?? "Select DOB", style: const TextStyle(fontSize: 15)),
                   const Icon(Icons.calendar_today),
                 ],
               ),
@@ -216,5 +265,26 @@ class _InformationPageState extends State<InformationPage> {
         ],
       ),
     );
+  }
+}
+
+// DOB formatter
+String? formatDob(String? raw) {
+  if (raw == null) return null;
+
+  try {
+    // RFC 1123 format
+    DateFormat rfcFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", 'en_US');
+    DateTime parsed = rfcFormat.parseUtc(raw).toLocal();
+    return DateFormat('MM/dd/yyyy').format(parsed);
+  } catch (_) {
+    try {
+      // ISO 8601 fallback
+      DateTime parsed = DateTime.parse(raw);
+      return DateFormat('MM/dd/yyyy').format(parsed);
+    } catch (e) {
+      print("DOB format error: $e");
+      return null;
+    }
   }
 }

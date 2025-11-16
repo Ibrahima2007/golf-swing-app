@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/login_screen.dart';
+import 'package:mobile/screens/reset_screen.dart';
 import 'package:provider/provider.dart';
 import '../services/account_handler.dart';
 import 'home_page.dart';
@@ -108,6 +109,12 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         // TODO: Change password screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ResetPasswordPage(),
+                          ),
+                        );
                       },
                       child: const Text("Change Password"),
                     ),

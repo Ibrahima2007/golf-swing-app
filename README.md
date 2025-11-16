@@ -1,48 +1,42 @@
 golf-coach-chatbot/
 │
-├── backend/ # Flask backend
+├── backend/ # Unified backend (current code)
 │ ├── app/
-│ │ ├── **init**.py # Initialize Flask app
+│ │ ├── **init**.py
 │ │ ├── config.py # API keys, Firebase config
 │ │ ├── routes/
 │ │ │ ├── **init**.py
 │ │ │ ├── auth_routes.py # Firebase JWT verification
 │ │ │ └── chat_routes.py # ChatGPT integration
 │ │ ├── services/
-│ │ │ ├── chatbot_service.py # ChatGPT call logic
-│ │ │ ├── firebase_service.py # Firestore and Auth utilities
-│ │ │ └── user_service.py # User-related operations
+│ │ │ ├── chatbot_service.py
+│ │ │ ├── firebase_service.py
+│ │ │ └── user_service.py
 │ │ ├── utils/
 │ │ │ ├── error_handlers.py
 │ │ │ └── validation.py
-│ │ └── database.py # Optional if mixing Firestore + SQL
-│ │
-│ ├── run.py # Entry point
+│ │ └── database.py
 │ ├── requirements.txt
-│ └── .env.example # For API keys
+│ └── legacy/ # Archived backend variants
+│ ├── backend_flask/
+│ ├── gpt_wrapper/
+│ └── gptwrapper/
 │
-├── mobile/ # Flutter frontend
+├── frontend/ # Unified Flutter app
 │ ├── lib/
 │ │ ├── main.dart # App entry
-│ │ ├── screens/
-│ │ │ ├── login_screen.dart
-│ │ │ ├── chat_screen.dart
-│ │ │ └── profile_screen.dart
-│ │ ├── services/
-│ │ │ ├── api_service.dart # Talks to Flask API
-│ │ │ └── firebase_service.dart # Auth + Firestore access
+│ │ ├── navigation/
+│ │ ├── providers/
+│ │ ├── screens/ # Login, Home, Profile, Upload, Chatbot
+│ │ ├── services/ # API + auth handlers
 │ │ ├── models/
-│ │ │ ├── message.dart
-│ │ │ └── user.dart
-│ │ ├── widgets/
-│ │ │ ├── chat_bubble.dart
-│ │ │ └── message_input.dart
-│ │ └── utils/
-│ │ └── constants.dart
-│ │
+│ │ ├── utils/
+│ │ └── widgets/
 │ ├── pubspec.yaml
-│ └── android/ ios/ web/ # Flutter native directories
+│ ├── android/ ios/ web/ # Platform-specific shells
+│ └── README.md
 │
-├── .gitignore
-├── README.md
-└── docker-compose.yml # optional containerized setup
+├── frontend_legacy/ # Previous teammate Flutter app (reference only)
+├── uploads/ # User-uploaded swing videos
+├── docker-compose.yml
+└── README.md (this file)

@@ -13,7 +13,7 @@ def initialize_firebase():
         if not firebase_admin._apps:
             basedir = os.path.abspath(os.path.dirname(__file__))
             print(basedir)
-            cred = credentials.Certificate(basedir + '/private_key.json')
+            cred = credentials.Certificate(os.path.join(os.path.dirname(basedir), 'gold-swing-analysis-app-firebase-adminsdk-fbsvc-03c3585b37.json'))
             firebase_admin.initialize_app(cred)
         
         db = firestore.client()

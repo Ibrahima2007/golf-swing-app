@@ -150,20 +150,31 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                             _formKey.currentState!.save();
                             setState(() => _errorMessage = null);
                             try {
+                              print('Starting account creation for: $_email');
                               final success = await Provider.of<AccountHandler>(context, listen: false)
                                   .createAccount(_firstName, _lastName, _email, _password);
+                              print('Account creation returned: ${success.isNotEmpty ? "SUCCESS" : "FAILED"}');
+                              print('Session token length: ${success.length}');
                               if (success.isNotEmpty) {
                                 Globals.sessionToken = success;
                                 Globals.isGuest = false;
-                                if (!mounted) return;
+                                print('Session token set, navigating to profile info...');
+                                if (!mounted) {
+                                  print('Widget not mounted, cannot navigate');
+                                  return;
+                                }
                                 Navigator.pushReplacementNamed(
                                   context,
                                   AppRoutes.profileInfo,
                                 );
+                                print('Navigation command executed');
                               } else {
+                                if (!mounted) return;
                                 setState(() => _errorMessage = 'That email is already in use. Try a different one.');
                               }
                             } catch (e) {
+                              print('Exception during signup: $e');
+                              if (!mounted) return;
                               setState(() => _errorMessage = 'Signup failed: $e');
                             }
                           }

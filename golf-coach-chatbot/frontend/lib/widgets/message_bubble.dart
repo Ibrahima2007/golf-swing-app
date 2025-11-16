@@ -31,7 +31,7 @@ class MessageBubble extends StatelessWidget {
             bottomRight: Radius.circular(isUser ? 4 : 18),
           ),
         ),
-        child: Text(
+        child: SelectableText(
           message.text,
           style: TextStyle(color: textColor, fontSize: 15),
         ),

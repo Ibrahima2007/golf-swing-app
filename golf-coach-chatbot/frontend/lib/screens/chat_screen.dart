@@ -53,17 +53,23 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              PresetDropdown(
+        child: Column(
+          children: [
+            // Preset Questions - Fixed at top
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: PresetDropdown(
                 presets: defaultPresetQuestions,
                 onSelect: (value) => _sendMessage(context, presetText: value),
               ),
-              const SizedBox(height: 12),
-              Expanded(
+            ),
+            // Scrollable content area - This is the key fix
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -76,31 +82,36 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ],
                   ),
-                  child: ListView.builder(
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      return MessageBubble(message: message);
-                    },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Chat messages
+                      ...messages.map((message) => MessageBubble(message: message)),
+                      // Latest bot message (analysis report)
+                      if (latestBotMessage != null)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: SelectableText(
+                            latestBotMessage.text,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              if (latestBotMessage != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    latestBotMessage.text,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-              const SizedBox(height: 4),
-              Row(
+            ),
+            // Chat input area - Fixed at bottom
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Row(
                 children: [
                   Expanded(
                     child: TextField(
@@ -151,8 +162,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

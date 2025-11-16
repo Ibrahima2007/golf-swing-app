@@ -11,27 +11,44 @@ class AccountHandler extends ChangeNotifier {
   String get userName => "Alex";
 
   Future<String> createAccount(String firstName, String lastName, String email, String password) async {
-    Map<String, String> request = {
-      'first-name': firstName,
-      'last-name': lastName,
-      'email': email,
-      'password': password,
-    };
-    final headers = {"Content-Type": "application/json"};
-    final response = await http.post(
-      Uri.parse('$_baseUrl/part1'),
-      headers: headers,
-      body: json.encode(request),
-    );
+    try {
+      Map<String, String> request = {
+        'first-name': firstName,
+        'last-name': lastName,
+        'email': email,
+        'password': password,
+      };
+      final headers = {"Content-Type": "application/json"};
+      print('Sending account creation request to: $_baseUrl/part1');
+      final response = await http.post(
+        Uri.parse('$_baseUrl/part1'),
+        headers: headers,
+        body: json.encode(request),
+      );
 
-    var jsonResponse = json.decode(response.body);
-    if (jsonResponse['status'] == 'success') {
-      // Account created successfully
-      print('Account created: ${response.body}');
-      return jsonResponse['session_token'];
-    } else {
-      // Handle error
-      print('Failed to create account: ${response.body}');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        print('HTTP error: ${response.statusCode}');
+        return '';
+      }
+
+      var jsonResponse = json.decode(response.body);
+      print('Parsed JSON response: $jsonResponse');
+      
+      if (jsonResponse['status'] == 'success') {
+        // Account created successfully
+        final sessionToken = jsonResponse['session_token'] ?? '';
+        print('Account created successfully, session token: $sessionToken');
+        return sessionToken;
+      } else {
+        // Handle error
+        print('Failed to create account: ${response.body}');
+        return '';
+      }
+    } catch (e) {
+      print('Exception in createAccount: $e');
       return '';
     }
   }

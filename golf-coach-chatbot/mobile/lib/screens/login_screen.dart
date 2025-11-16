@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:dob_input_field/dob_input_field.dart';
 import 'package:country_picker/country_picker.dart';
 import '../services/account_handler.dart';
+import 'reset_screen.dart';
 
 class Globals {
   static String sessionToken = '';
@@ -284,7 +285,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Provider.of<AccountHandler>(context, listen: false).getUserInfo(Globals.sessionToken);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(builder: (context) => const ResetPasswordSendPage()),
+                  );
                 },
                 child: Text('Forgot Password')
               ),

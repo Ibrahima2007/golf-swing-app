@@ -1,10 +1,12 @@
 #https://blog.logrocket.com/integrating-flask-flutter-apps/
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from services import firebase_service
 import os
 
 
 app = Flask(__name__)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 @app.route('/account/part1', methods=['POST'])
@@ -34,6 +36,25 @@ def getAccountInfo():
 @app.route('/account/update', methods=['POST'])
 def updateAccountInfo():
     response = firebase_service.updateAccountInfo(request.json)
+    return jsonify(response)
+
+@app.route('/account/reset', methods=['POST'])
+def sendResetPasswordEmail():
+    email = request.json["email"]
+    response = firebase_service.sendResetPasswordEmail(email)
+    return jsonify(response)
+
+@app.route('/account/resetCode', methods=['POST'])
+def resetPasswordCode():
+    code = request.json["code"]
+    response = firebase_service.resetPasswordCode(code)
+    return jsonify(response)
+
+@app.route('/account/resetPassword', methods=['POST'])
+def resetPassword():
+    password = request.json["password"]
+    sessionToken = request.json["session_token"]
+    response = firebase_service.resetPassword(password, sessionToken)
     return jsonify(response)
 
 if __name__ == '__main__':

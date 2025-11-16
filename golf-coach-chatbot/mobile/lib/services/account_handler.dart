@@ -100,4 +100,68 @@ class AccountHandler extends ChangeNotifier {
       return '';
     }
   } 
+  
+  Future<String> sendResetPasswordEmail(email) async {
+    Map<String, String> request = {
+      'email': email
+    };
+    final headers = {"Content-Type": "application/json"};
+    final response = await http.post(
+      Uri.parse('$url/reset'),
+      headers: headers,
+      body: json.encode(request),
+    );
+
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 'success') {
+      // Account created successfully
+      return 'success';
+    } else {
+      // Handle error
+      return '';
+    }
+  }
+
+  Future<String> resetPasswordCode(code) async {
+    Map<String, String> request = {
+      'code': code
+    };
+    final headers = {"Content-Type": "application/json"};
+    final response = await http.post(
+      Uri.parse('$url/resetCode'),
+      headers: headers,
+      body: json.encode(request),
+    );
+
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 'success') {
+      // Account created successfully
+      return jsonResponse["session_token"];
+    } else {
+      // Handle error
+      return '';
+    }
+  }
+
+  Future<String> resetPassword(password, sessionToken) async {
+    Map<String, String> request = {
+      'password': password,
+      'session_token': sessionToken
+    };
+    final headers = {"Content-Type": "application/json"};
+    final response = await http.post(
+      Uri.parse('$url/resetPassword'),
+      headers: headers,
+      body: json.encode(request),
+    );
+
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 'success') {
+      // Account created successfully
+      return 'success';
+    } else {
+      // Handle error
+      return '';
+    }
+  }
 }

@@ -229,7 +229,6 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
   final _formKey = GlobalKey<FormState>();
   String _password = '';
   String _confirmPassword = '';
-  final _passwordController = TextEditingController();
 
   var pagePadding = EdgeInsets.symmetric(horizontal: 20, vertical: 16);
 

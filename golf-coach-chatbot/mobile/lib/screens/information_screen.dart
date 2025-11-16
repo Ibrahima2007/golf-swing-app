@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile/screens/login_screen.dart';
 import 'package:mobile/screens/profile_screen.dart';
 import 'package:mobile/services/account_handler.dart';
+import 'package:country_picker/country_picker.dart';
 
 // TEMPORARY — Replace this with SharedPreferences later
 var sessionToken = Globals.sessionToken;
@@ -128,17 +129,23 @@ class _InformationPageState extends State<InformationPage> {
                         (v) => setState(() => gender = v),
                         ["Gender", "Male", "Female", "Other", "Prefer not to say"],
                       ),
-                      buildDropdown(
-                        "Country",
-                        country,
-                        (v) => setState(() => country = v),
-                        [
-                          "United States",
-                          "Canada",
-                          "United Kingdom",
-                          "Australia",
-                          "Other"
-                        ],
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          minimumSize: Size(400, 50)
+                        ),
+                        child: Text(country!),
+                        onPressed: () {
+                          showCountryPicker(
+                            context: context,
+                            onSelect: (Country count) {
+                              setState(() {
+                                country = count.name;
+                              });
+                            }
+                          );
+                        }
                       ),
                       const SizedBox(height: 40),
 

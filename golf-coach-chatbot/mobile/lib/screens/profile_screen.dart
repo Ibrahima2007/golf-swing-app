@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/login_screen.dart';
 import 'package:mobile/screens/reset_screen.dart';
-import 'package:provider/provider.dart';
-import '../services/account_handler.dart';
-import 'home_page.dart';
-import 'information_screen.dart';
+import 'package:mobile/screens/home_page.dart';
+import 'package:mobile/screens/information_screen.dart';
+import 'package:mobile/services/account_handler.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -12,8 +11,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<AccountHandler>(context, listen: false)
-          .getUserInfo(Globals.sessionToken),
+      future: AccountHandler().getUserInfo(Globals.sessionToken),
       builder: (context, snapshot) {
         // Loading state
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -22,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
           );
         }
 
-        // Error
+        // Error state
         if (!snapshot.hasData || snapshot.data == null) {
           return const Scaffold(
             body: Center(
@@ -34,7 +32,6 @@ class ProfileScreen extends StatelessWidget {
           );
         }
 
-        // Loaded successfully
         final account = snapshot.data as Map<String, dynamic>;
         final String username = account["first-name"] ?? "Player";
 
@@ -43,17 +40,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ——————————————————————————————————————————————
-  //   FULL UI (everything centered like you wanted)
-  // ——————————————————————————————————————————————
   Widget _buildProfile(BuildContext context, String username) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-
       body: SafeArea(
         child: Column(
           children: [
-            // Title centered at top
+            // Title
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
@@ -66,18 +59,21 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            // Center column content
+            // Center content
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Profile Avatar
+                    // Avatar
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.green,
-                      child: const Icon(Icons.person,
-                          color: Colors.white, size: 50),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 50,
+                      ),
                     ),
                     const SizedBox(height: 40),
 
@@ -108,7 +104,6 @@ class ProfileScreen extends StatelessWidget {
                         minimumSize: const Size(250, 50),
                       ),
                       onPressed: () {
-                        // TODO: Change password screen
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -117,6 +112,30 @@ class ProfileScreen extends StatelessWidget {
                         );
                       },
                       child: const Text("Change Password"),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Logout Button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(250, 50),
+                      ),
+                      onPressed: () {
+                        // Clear session
+                        Globals.sessionToken = "";
+
+                        // Navigate to login/account creation page
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AccountCreationPage(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text("Log Out"),
                     ),
                   ],
                 ),
@@ -133,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Home icon (outline because NOT active)
+            // Home icon
             IconButton(
               icon: const Icon(Icons.home_outlined, color: Colors.white),
               onPressed: () {
@@ -146,12 +165,11 @@ class ProfileScreen extends StatelessWidget {
 
             // Chat icon
             IconButton(
-              icon:
-                  const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
               onPressed: () {},
             ),
 
-            // Profile icon (filled because ACTIVE)
+            // Profile icon
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {},

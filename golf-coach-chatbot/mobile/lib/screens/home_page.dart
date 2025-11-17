@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../services/account_handler.dart';
 import 'profile_screen.dart';
@@ -8,10 +9,43 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final account = Provider.of<AccountHandler>(context, listen: false);
-    final String username = "User123"; // Temporary placeholder username
+    var sessionToken = Globals.sessionToken;
+    return FutureBuilder(
+      future: Provider.of<AccountHandler>(context, listen: false)
+          .getUserInfo(sessionToken),
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    // Placeholder recent conversations
+        // Error state
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(
+              child: Text(
+                "Error loading user data",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          );
+        }
+
+        // Data loaded
+        final account = snapshot.data as Map<String, dynamic>;
+        final String username = account["first-name"] ?? "Player";
+
+        return _buildHomePage(context, username);
+      },
+    );
+  }
+
+  // ——————————————————————————————————————————————————————————————
+  //   🔥 YOUR FULL HOMEPAGE UI (unchanged, just extracted cleanly)
+  // ——————————————————————————————————————————————————————————————
+  Widget _buildHomePage(BuildContext context, String username) {
     final List<Map<String, String>> recentConversations = [
       {"title": "Improving my backswing", "date": "Nov 10, 2025"},
       {"title": "How to increase swing speed", "date": "Nov 8, 2025"},
@@ -23,7 +57,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
 
-      // 🧱 Body Section
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -31,13 +64,13 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 👋 Header Row (Welcome + Logo)
+                // ————————————————— Header
                 Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 30),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Left side: Welcome text
+                      // Welcome text
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -62,16 +95,13 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
 
-                      // Right side: App Logo
-                      Image.asset(
-                        'images/icon.png',
-                        height: 200,
-                      ),
+                      // Logo
+                      Image.asset('images/icon.png', height: 200),
                     ],
                   ),
                 ),
 
-                // 💬 Conversation History Header
+                // ————————————————— Conversation Header
                 Text(
                   "Conversation History",
                   style: Theme.of(context)
@@ -79,9 +109,10 @@ class HomePage extends StatelessWidget {
                       .headlineSmall
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
+
                 const SizedBox(height: 16),
 
-                // 🗂️ Recent Conversations List
+                // ————————————————— Conversations List
                 if (recentConversations.isEmpty)
                   const Center(
                     child: Text(
@@ -115,9 +146,7 @@ class HomePage extends StatelessWidget {
                             "Last updated: ${chat["date"]}",
                             style: const TextStyle(color: Colors.black54),
                           ),
-                          onTap: () {
-                            // TODO: Navigate to chat detail page
-                          },
+                          onTap: () {},
                         ),
                       );
                     }).toList(),
@@ -125,7 +154,7 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 25),
 
-                // 🆕 New Conversation Button
+                // ————————————————— New Conversation Button
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -137,9 +166,7 @@ class HomePage extends StatelessWidget {
                       ),
                       elevation: 4,
                     ),
-                    onPressed: () {
-                      // TODO: Handle new conversation start
-                    },
+                    onPressed: () {},
                     child: const Text(
                       "New Conversation",
                       style:
@@ -147,6 +174,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 80),
               ],
             ),
@@ -154,42 +182,36 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // 🌿 Bottom Navigation Bar
+      // ————————————————— Bottom Navigation
       bottomNavigationBar: BottomAppBar(
         color: Colors.green.shade600,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 6.0,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // 🏠 Home (Filled)
+              // Home icon (solid)
               IconButton(
                 icon: const Icon(Icons.home, color: Colors.white, size: 30),
-                onPressed: () {
-                  // Already on Home
-                },
+                onPressed: () {},
               ),
 
-              // 💬 Chat
+              // Chat icon
               IconButton(
-                icon: const Icon(Icons.chat_outlined,
-                    color: Colors.white, size: 28),
-                onPressed: () {
-                  // TODO: Navigate to Chat page
-                },
+                icon:
+                    const Icon(Icons.chat_outlined, color: Colors.white, size: 28),
+                onPressed: () {},
               ),
 
-              // 👤 Account
+              // Profile icon
               IconButton(
                 icon: const Icon(Icons.person_outline,
                     color: Colors.white, size: 28),
                 onPressed: () {
-                  // TODO: Navigate to Account page
                   Navigator.push(
                     context,
-                    MaterialPageRoute<void>(builder:(context) => const ProfileScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()),
                   );
                 },
               ),

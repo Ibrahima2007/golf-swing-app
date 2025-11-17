@@ -36,5 +36,24 @@ def updateAccountInfo():
     response = firebase_service.updateAccountInfo(request.json)
     return jsonify(response)
 
+@app.route('/account/reset', methods=['POST'])
+def sendResetPasswordEmail():
+    email = request.json["email"]
+    response = firebase_service.sendResetPasswordEmail(email)
+    return jsonify(response)
+
+@app.route('/account/resetCode', methods=['POST'])
+def resetPasswordCode():
+    code = request.json["code"]
+    response = firebase_service.resetPasswordCode(code)
+    return jsonify(response)
+
+@app.route('/account/resetPassword', methods=['POST'])
+def resetPassword():
+    password = request.json["password"]
+    sessionToken = request.json["session_token"]
+    response = firebase_service.resetPassword(password, sessionToken)
+    return jsonify(response)
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:dob_input_field/dob_input_field.dart';
 import 'package:country_picker/country_picker.dart';
 import '../services/account_handler.dart';
+import 'reset_screen.dart';
 
 class Globals {
   static String sessionToken = '';
@@ -138,6 +140,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).createAccount(_firstName, _lastName, _email, _password);
+                            print("Session token: $success");
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
                               Navigator.push(
@@ -260,10 +263,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final success = await Provider.of<AccountHandler>(context, listen: false).login(_email, _password);
+                            print("Session token: $success");
                             if (success.isNotEmpty) {
                               Globals.sessionToken = success;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Successful login!')),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(builder: (context) => const HomePage()),
                               );
                             }
                             else {
@@ -281,7 +286,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Provider.of<AccountHandler>(context, listen: false).getUserInfo(Globals.sessionToken);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(builder: (context) => const ResetPasswordSendPage()),
+                  );
                 },
                 child: Text('Forgot Password')
               ),
@@ -492,15 +500,14 @@ class _AccountCreationPagePart1State extends State<AccountCreationPagePart1> {
                           _formKey.currentState!.save();
                           final success = await Provider.of<AccountHandler>(context, listen: false).updateAccountDetails(_dateOfBirth, _role, _privacy, _golf, _gender, _country, Globals.sessionToken);
                           if (success.isNotEmpty) {
-                            Globals.sessionToken = success;
                             Navigator.push(
                               context,
-                              MaterialPageRoute<void>(builder: (context) => const AccountCreationPagePart1()),
+                              MaterialPageRoute<void>(builder: (context) => const HomePage()),
                             );
                           }
                           else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Email already in use, please choose a different one.')),
+                              SnackBar(content: Text('Failed to create account details.')),
                             );
                           }
                         }

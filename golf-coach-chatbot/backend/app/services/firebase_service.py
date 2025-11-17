@@ -6,6 +6,7 @@ import os
 from hashlib import sha256
 import random
 import string
+from services import email_services
 
 def initialize_firebase():
     try:
@@ -132,3 +133,60 @@ def updateAccountInfo(data: dict) -> dict:
         "message": "Account info succesfully updated",
         "user-info": userData
     }
+
+def sendResetPasswordEmail(email: str) -> dict:
+    matchingEmail = db.collection('user-info').where('email', '==', email).get()
+    if len(matchingEmail) == 0:
+        print("Failed")
+        return {'status': 'error', 'message': 'Account not found'}
+    
+    userDoc = matchingEmail[0]
+    userData = userDoc.to_dict()
+    email = userData["email"]
+
+    resetNumber = str(random.randint(100000, 999999))
+    email_services.sendResetEmail(email, resetNumber)
+
+    matchingResetEmail = db.collection('reset-password').where('email', '==', email).get()
+    if len(matchingResetEmail) == 0:
+        newReset = db.collection('reset-password').document()
+        newReset.set({
+            "email": email,
+            "reset_number": resetNumber,
+            "time_requested": datetime.now()
+        })
+    else:
+        resetDoc = matchingResetEmail[0]
+        resetDoc.reference.update({"reset_number": resetNumber})
+
+    return {'status': 'success', 'message': 'Email sent'}
+
+def resetPasswordCode(code: str) -> dict:
+    matchingCode = db.collection('reset-password').where('reset_number', '==', code).get()
+    if len(matchingCode) == 0:
+        return {'status': 'error', 'message': 'Account not found'}
+
+    codeDoc = matchingCode[0]
+    codeData = codeDoc.to_dict()
+    
+    matchingEmail = db.collection('user-info').where('email', '==', codeData['email']).get()
+    userDoc = matchingEmail[0]
+    userData = userDoc.to_dict()
+    sessionToken = generateSalt(30)
+    userDoc.reference.update({'session_token': sessionToken})
+
+    return {'status': 'success', 'message': 'Code approved', 'session_token': sessionToken}
+
+def resetPassword(password: str, sessionToken: str) -> dict:
+    matchingToken = db.collection('user-info').where('session_token', '==', sessionToken).get()
+
+    if len(matchingToken) == 0:
+        return {'status': 'error', 'message': 'Invalid session token'}
+
+    userDoc = matchingToken[0]
+    userData = userDoc.to_dict()
+
+    salt = userData['salt']
+    hashedPassword = sha256((password + salt).encode()).hexdigest()
+    userDoc.reference.update({'hashed-password': hashedPassword})
+    return {'status': 'success', 'message': 'Password updated'}

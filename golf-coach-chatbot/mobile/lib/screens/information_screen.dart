@@ -6,7 +6,6 @@ import 'package:mobile/services/account_handler.dart';
 import 'package:country_picker/country_picker.dart';
 
 // TEMPORARY — Replace this with SharedPreferences later
-var sessionToken = Globals.sessionToken;
 
 class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
@@ -21,17 +20,19 @@ class _InformationPageState extends State<InformationPage> {
   String? privacy;
   String? golfLevel;
   String? gender;
-  String? country;
+  String? country = "None";
 
   final accountHandler = AccountHandler();
 
   @override
   void initState() {
+    var sessionToken = Globals.sessionToken;
     super.initState();
     loadUserInfo();
   }
 
   Future<void> loadUserInfo() async {
+    var sessionToken = Globals.sessionToken;
     if (sessionToken.isEmpty) return;
 
     final userInfo = await accountHandler.getUserInfo(sessionToken);
@@ -160,6 +161,7 @@ class _InformationPageState extends State<InformationPage> {
                           ),
                         ),
                         onPressed: () async {
+                          var sessionToken = Globals.sessionToken;
                           if (sessionToken.isEmpty) return;
 
                           // Update all fields in the database

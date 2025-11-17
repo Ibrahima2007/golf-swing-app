@@ -10,6 +10,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Profile Session Token: " + Globals.sessionToken);
     return FutureBuilder(
       future: AccountHandler().getUserInfo(Globals.sessionToken),
       builder: (context, snapshot) {

@@ -25,11 +25,11 @@ class AccountHandler extends ChangeNotifier {
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == 'success') {
       // Account created successfully
-      print('Account created: ${response.body}');
+      // print('Account created: ${response.body}');
       return jsonResponse['session_token'];
     } else {
       // Handle error
-      print('Failed to create account: ${response.body}');
+      // print('Failed to create account: ${response.body}');
       return '';
     }
   }
@@ -44,11 +44,11 @@ class AccountHandler extends ChangeNotifier {
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == 'success') {
       // Login successful
-      print('Login successful: ${response.body}');
+      // print('Login successful: ${response.body}');
       return jsonResponse['user-info']['session_token'];
     } else {
       // Handle error
-      print('Failed to login: ${response.body}');
+      // print('Failed to login: ${response.body}');
       return '';
     }
   }
@@ -63,11 +63,11 @@ class AccountHandler extends ChangeNotifier {
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == 'success') {
       // Retrieved user info successfully
-      print('User info retrieved: ${response.body}');
+      // print('User info retrieved: ${response.body}');
       return jsonResponse['user-info'];
     } else {
       // Handle error
-      print('Failed to retrieve user info: ${response.body}');
+      // print('Failed to retrieve user info: ${response.body}');
       return null;
     }
   }
@@ -92,11 +92,11 @@ class AccountHandler extends ChangeNotifier {
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == 'success') {
       // Account created successfully
-      print('Account info updated: ${response.body}');
+      // print('Account info updated: ${response.body}');
       return 'success';
     } else {
       // Handle error
-      print('Failed to update account: ${response.body}');
+      // print('Failed to update account: ${response.body}');
       return '';
     }
   } 
